@@ -1,0 +1,110 @@
+h1. 安装必需软件kscopegeanybcomparegnome指挥官
+
+* 安装常用软件
+** 安装geany
+  apt-get install geany
+
+** 安装gnome指挥官
+  apt-get install gnome-commander
+
+** 安装kscope
+<pre>
+ kscope的安装脚本
+#!/bin/bash
+# This script helps you install Kscope on Ubuntu 9.04.
+# You can also use it to fix "Kscope doesn't run in KDE4" bug.
+
+echo "Determining machine hardware name... "
+MACHINE=`uname -m`
+case "$MACHINE" in
+  i386 | i586 | i686)
+    ARCH="i386"
+    ;;
+  x86_64)
+    ARCH="amd64"
+    ;;
+  *)
+    ARCH="i386"
+    ;;
+esac
+
+# If Kscope is not installed, install it.
+which kscope &> /dev/null
+if [ $? -ne 0 ]; then
+  echo "Installing kscope..."
+  sudo apt-get install kscope || /
+  wget http://archive.ubuntu.com/ubuntu/pool/universe/k/kscope/kscope_1.6.0-1_${ARCH}.deb && /
+  sudo dpkg -i kscope_*.deb || /
+  sudo apt-get -fy install || /
+  echo "Oops, some error happens..."
+fi
+
+kscope -v &> /dev/null
+if [ $? -eq 0 ]; then
+  echo "Kscope works fine."
+  exit
+fi
+
+echo "Downloading KDE3 libraries needed by kscope..."
+wget http://ftp.debian.org/debian/pool/main/k/kdebase/kate_3.5.9.dfsg.1-6+lenny1_${ARCH}.deb
+dpkg -x kate_3*.deb kate
+
+echo "Installing KDE3 libraries..."
+sudo cp kate/usr/lib/libkateinterfaces.so.0.0.0 /usr/local/lib/
+sudo cp kate/usr/lib/libkateutils.so.0.0.0 /usr/local/lib
+sudo ln -s /usr/local/lib/libkateinterfaces.so.0.0.0 /usr/local/lib/libkateinterfaces.so.0
+sudo ln -s /usr/local/lib/libkateutils.so.0.0.0 /usr/local/lib/libkateutils.so.0
+sudo ldconfig
+
+echo "Finished."
+</pre>
+
+** 安装最新的bcompare
+# 下载安装包
+ wget http://www.scootersoftware.com/bcompare-3.3.4.14431.tar.gz
+# 解压安装包
+ root@android-work2:~# tar xzvf bcompare-3.3.4.14431.tar.gz 
+# 执行安装脚本
+<pre>
+root@android-work2:~/bcompare-3.3.4.14431# ./install.sh 
+
+install prefix? [/usr]
+</pre> 
+# 破解version 3.3.4 (build 14431)
+<pre>
+Beyong compare
+version 3.3.4 (build 14431)
+Key:
+--- BEGIN LICENSE KEY ---
+HmB5oANygQOhaStTHNa+zOKgOeWHOkeAp6d1+QwIebz6z9kwYCm9-O0jF9F79zvzed9v5UVC4VrDkDMmTM8nB+
+--- END LICENSE KEY -----
+</pre>
+
+** 安装破解版Beyond Compare 3.3.2*
+<pre>
+
+这个破解只适用于3.1.10.11626_i386版本
+
+首先下载并安装原版
+
+在终端通过以下命令下载
+
+wget http://www.scootersoftware.com/BCompareLinux-3.1.10.11626_i386.deb
+
+或者在这里下载：http://download.csdn.net/source/2406854
+
+ 
+
+原版安装成功后，然后按照以下步骤安装破解bcompare-3.1.10.11626-crack.tar.gz
+
+破解补丁下载地址：http://download.csdn.net/source/2406879
+
+1. 用tar解压后进入解压目录
+2. 运行./keygen，为BCompare打上patch并生成license
+3. 运行./install.sh安装
+4. 运行bcompare启动，然后贴入第2步生成的license
+</pre>
+** 安装emacs tmux
+<pre>
+root@android-work1:~# apt-get install  emacs tmux
+</pre>

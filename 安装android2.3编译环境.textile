@@ -1,0 +1,66 @@
+h1. 安装android23编译环境
+
+* 额外安装android4.0编译环境
+<pre>
+$ sudo apt-get install texinfo gettext
+</pre>
+
+* 安装android2.3编译环境
+<pre>
+apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev libc6-dev lib32ncurses5-dev ia32-libs x11proto-core-dev libx11-dev lib32readline5-dev lib32z-dev libgl1-mesa-dev g++-multilib mingw32 tofrodos python-markdown libxml2-utils xsltproc
+</pre>
+
+* 手动执行安装sun-java6-jdk文件
+<pre>
+  下载 http://download.oracle.com/otn-pub/java/jdk/6u25-b06/jdk-6u25-linux-x64.bin
+   cd /opt/
+   wget  http://download.oracle.com/otn-pub/java/jdk/6u25-b06/jdk-6u25-linux-x64.bin
+   chmod 755 jdk-6u25-linux-x64.bin
+   ./jdk-6u25-linux-x64.bin
+
+   root@android-work2:~#cat /etc/profile.d/java.sh 
+   #set java environment
+   export JAVA_HOME=/opt/jdk1.6.0_30
+   export CLASSPATH=./:$JAVA_HOME/lib:$JAVA_HOME/jre/lib
+   export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH
+   
+   root@android-work2:~#source /etc/profile.d/java.sh
+
+root@android-work1:/opt# java -version
+java version "1.6.0_30"
+Java(TM) SE Runtime Environment (build 1.6.0_30-b12)
+Java HotSpot(TM) 64-Bit Server VM (build 20.5-b03, mixed mode)
+</pre> 
+
+* 使用apt包管理器安装sun-java6-jdk
+  http://source.android.com/source/initializing.html
+<pre>
+[/root]#apt-get install vim  openssh-server
+[/root]#apt-get install python-software-properties
+[/root]#add-apt-repository "deb http://archive.canonical.com/ lucid partner"
+[/root]#apt-get update
+[/root]#apt-get install sun-java6-jdk sun-java6-plugin
+</pre>
+
+* 切换sun-java-jdk
+<pre>
+ [/root]#update-alternatives --config java
+
+ 有 2 个选项可用于替换项 java (提供 /usr/bin/java)。
+
+   选择       路径                                    优先级  状态
+ ------------------------------------------------------------
+   0            /usr/lib/jvm/java-6-openjdk/jre/bin/java   1061      自动模式
+   1            /usr/lib/jvm/java-6-openjdk/jre/bin/java   1061      手动模式
+ * 2            /usr/lib/jvm/java-6-sun/jre/bin/java       63        手动模式
+
+ 要维持当前值[*]请按回车键，或者键入选择的编号：2
+</pre>
+
+* 确认java版本号
+<pre>
+ [/root]#java -version
+ java version "1.6.0_26"
+ Java(TM) SE Runtime Environment (build 1.6.0_26-b03)
+ Java HotSpot(TM) 64-Bit Server VM (build 20.1-b02, mixed mode)
+</pre>
