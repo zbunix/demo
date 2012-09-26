@@ -1,0 +1,342 @@
+h1. 安装ubuntu1004-sever-amd64
+
+* ubuntu系统更改主机名
+# vi /etc/hosts
+  127.0.1.1    newhostname
+# vi /etc/hostname文件 删除该文件的所有内容，添加newhostname
+# 修改立即生效
+  运行一下命令 hostname newhostname
+
+* 使用强大的bash换掉弱的dash
+<pre>
+法一：
+ root@android-work1:~# ln -sf /bin/bash /bin/sh
+
+法二：
+sudo dpkg-reconfigure dash
+</pre>
+
+* faq 
+** xxx is not in the sudoers file
+<pre>
+sudo make install这一步的时候出现xxx is not in the sudoers file. This incident will be reported的错误，
+原来是linux默认没有开启sudo权限，
+解决方法：
+＃su - #chmod u+w /etc/sudoers 
+#visudo 在root ALL=(ALL) ALLZ
+下添加xxx ALL=(ALL) ALL 
+然后按esc键，
+再输入:wq
+保存退出＃chmod u-w /etc/sudoers
+问题解决
+</pre>
+
+* ubuntu10.04开启root用户方法
+<pre>
+1、激活root账户
+
+$sudo passwd root
+
+输入你的密码和root的密码
+
+2.修改/etc/gdm/gdm.schemas
+
+vi /etc/gdm/gdm.schemas
+
+<schema>
+      <key>greeter/Include</key>
+      <signature>s</signature>
+      <default></default>
+    </schema>
+
+    <schema>
+      <key>greeter/Exclude</key>
+      <signature>s</signature>
+      <default>bin,root,daemon,adm,lp,sync,shutdown,halt,mail,news,uucp,operator,nobody,nobody4,noaccess,postgres,pvm,rpm,nfsnobody,pcap</default>
+    </schema>
+
+    把下边schema中的root去掉，放到上面的那个里面，终于万事大吉，在登陆框里看到root了
+</pre>
+
+* 修改国内快速源--网易
+<pre>
+deb http://mirrors.163.com/ubuntu/ lucid main universe restricted multiverse
+deb-src http://mirrors.163.com/ubuntu/ lucid main universe restricted multiverse
+deb http://mirrors.163.com/ubuntu/ lucid-security universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ lucid-security universe main multiverse restricted
+deb http://mirrors.163.com/ubuntu/ lucid-updates universe main multiverse restricted
+deb http://mirrors.163.com/ubuntu/ lucid-proposed universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ lucid-proposed universe main multiverse restricted
+deb http://mirrors.163.com/ubuntu/ lucid-backports universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ lucid-backports universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ lucid-updates universe main multiverse restricted
+</pre>
+
+* 安装ubuntu server10.04图形界面
+* kdm图形化登录管理器
+<pre>
+sudo apt-get install kdm
+ubuntu kdm gdm 转换
+sudo dpkg-reconfigure kdm
+sudo apt-get remove kdm
+</pre>
+
+* xdm图形化登录管理器
+<pre>
+apt-get install  xdm
+dpkg-reconfigure xdm
+service gdm stop
+service xdm stop
+service kdm stop
+
+启动XDM时关掉本地UI
+root@android-work2:/# vi /etc/X11/xdm/xdm-config
+!DisplayManager.requestPort:    0
+
+关掉本地UI
+root@android-work2:/# vi /etc/X11/xdm/Xservers
+#:0 local /usr/bin/X :0 vt7 -nolisten tcp
+
+权限配置和使能广播
+root@android-work2:/# vi /etc/X11/xdm/Xaccess
+*                                       #any host can get a login window
+
+*               CHOOSER BROADCAST       #any indirect host can get a chooser
+
+加快搜索速度(干掉xdm error : Cannot convert Internet address to host name)
+远程登录linux主机过慢问题
+有时客户端想远程登录一台linux主机，但每次登录输入密码后都会等很长一段时间才会进入，
+这是因为linux主机在返回信息时需要解析ip，如果在linux主机的hosts文件事先加入客户端的ip地址，
+这时再从客户端远程登录linux就会变很快,这里所说的远程登录不仅仅是ssh，
+还可能是mysql远程登录，或是文件共享的查询等。
+root@android-work2:/# vi /etc/hosts
+127.0.0.1       localhost
+127.0.1.1       android-server1
+
+192.168.1.88        20100626-1007
+192.168.1.76            lijing
+192.168.1.172           nwd-ard-009
+192.168.1.34            nwd-os317
+192.168.1.31            android-316
+192.168.1.95            CHINA-EF7D91E85
+192.168.1.84            nwd-android-007
+192.168.1.214           NWD-APP-WHW
+192.168.1.37            nwd-dingjb
+192.168.1.75            weiaj
+192.168.1.230           nwd-0329
+192.168.1.123           PC-201105252144
+192.168.1.134           NWD-IT-LB
+192.168.1.91                    lqserver
+192.168.1.247          nwd-hd3-001
+192.168.1.246          yd-app45
+192.168.1.106           y3-app-29
+192.168.1.60        PC2012041414DBB
+
+查看xdm log调式信息
+root@android-work2:/# cat /var/log/xdm.log 
+
+
+重启xdm服务
+service xdm restart
+</pre>
+
+
+
+* gdm图形化登录管理器
+
+* ubuntu kdm gdm 转换
+
+<pre>
+[/root]#apt-get install ubuntu-desktop
+</pre>
+
+* 安装xmanager远程登录gdm服务
+
+** 修改gdm服务配置文件
+<pre>
+root@android-work1:~# vi /etc/gdm/gdm.schemas
+
+    <schema>
+      <key>greeter/IncludeAll</key>
+      <signature>b</signature>
+      <default>false</default>
+    </schema>
+
+    <schema>
+      <key>xdmcp/Enable</key>
+      <signature>b</signature>
+      <default>true</default>
+    </schema>
+</pre>
+
+** 增加/etc/gdm/custom.conf
+
+<pre>
+root@android-work1:~# vi /etc/gdm/custom.conf 
+# GDM configuration storage
+
+[daemon]
+
+[security]
+
+[xdmcp]
+
+Enable=true
+
+DisplaysPerHost=2
+
+[greeter]
+
+[chooser]
+
+[debug]
+</pre>
+
+** 重启gdm服务
+
+<pre>
+root@android-work1:~# /etc/init.d/gdm restart
+</pre>
+
+** 分区规划_安装lvm2
+ root@android-work2:~# apt-get install lvm2
+
+** xdcmp
+<pre>
+试下安装这几个登录管理器(任意装一个就行)：
+
+sudo apt-get install xdm
+sudo apt-get install lxdm
+
+xdm, gdm, lxdm, kdm都是桌面登录管理器，可以多个并存。
+在安装快结束时，会提示选择哪一种作为默认的。
+如果下次出现桌面管理器丢失，可以先删除xdm, lxdm,
+sudo apt-get remove xdm
+再安装一次并在安装时进行选择要使用的那种。
+sudo apt-get install xdm
+</pre>
+
+** Ubuntu VNC服务器与XDMCP服务器的配置 
+<pre>
+1.VNC服务器配置
+
+　　我所使用的ubuntu 10.04版本上自带了一个VNC服务器vino。
+
+　　该服务程序当开启允许远程登录服务时候，会自动启动，所以Ubuntu上根本不存在什么配置VNC服务器的难度。
+
+
+　　安装VNC客户端：
+
+　　　　$:sudo apt-get install xtightvncviewer
+
+　　安装完成后，可以直接使用xtightvncviewer命令来连接开启来远程登录服务的主机：
+
+　　　　$:xtightvncviewer IP
+
+
+2.XDMCP服务器配置
+
+　　ubuntu10.04版本上的gdm是不支持XDMCP服务的，需要安装另外的xdm或者kdm。
+
+
+　　安装KDE桌面(附带kdm)：
+
+　　　　$:sudo apt-get install kubuntu-desktop
+
+　　安装过程中，选用kdm作为默认点dm进行开机启动。
+</pre>
+
+* ubuntu 中文编码设置
+** 设置系统默认编码gbk
+<pre>
+我们知道在中文 Windows 下一般来说系统的默认编码是 GBK, 从 Java 开发的角度来说, 就是在进行诸如 Java 源代码编译, 文件读写等操作时, 默认使用的编码是 GBK; 而我们参照一般的 Ubuntu 中文安装文档, 可能会建议将默认的语言设置为 zh_CN.UTF-8, 这样会带来一些问题, 比如我在 Windows 使用 Eclipse 时的编辑器的默认编码是 GBK, 但是在 Ubuntu 下面就是 UTF-8, 同样是使用 Eclipse, 在 Windows 下的中文文档到了 Ubuntu 中会产生乱码, 必须手工逐个文档设置属性中的编码为 GBK 才可以正常; 一些测试代码也是以默认编码读取文件的, 这些代码读取出来的文件内容也会包含乱码.
+所以, 最好是将系统的默认编码设置为 GBK, 这样和 Windows 下面的开发环境最接近. 设置的方法应该不止一种, 我采用的是编辑 /etc/environment, 改成这个样子:
+LANGUAGE="zh_CN:zh:en_US:en"
+GST_ID3_TAG_ENCODING=GBK
+LANG=zh_CN.GBK
+LC_CTYLE=zh_CN.GBK
+</pre>
+** 增加支持gbk编码
+<pre>
+Ubuntu 默认采用UTF8编码，可以方便global。但对中文支持，还不细致，即便默认采用中文安装，也并不会自动添加GB＊等支持，致使在Ubuntu下访问部分Win文本文件时，出现乱码。
+I. 配置系统环境
+执行 sudo vi /var/lib/locales/supported.d/zh
+加入以下配置参数
+zh_CN.GB18030 GB18030 (最新汉字编码字符集，向下兼容GBK,GB2312)
+zh_CN.GBK GBK (汉字扩展编码,向下兼容GB2312, 并包含BIG5全部汉字)
+zh_CN.GB2312 GB2312 (简化汉字编码字符集, 最近有客户要我们改进GB2312,太看得起我们了，我只能说:"NO!")
+zh_CN.GB18031 GB18031 (数字键盘汉字编码输入,面向手持设备，我的Nokia3120从来就是发短信，接听电话，无法和PC通讯，就不用这个了。     maybe用Google Android SDK的大侠们需要这个)
+zh_HK.BIG5 BIG5 (繁体)
+zh_TW.BIG5 BIG5 (繁体)
+然后执行 sudo locale-gen
+提示以下信息，成功了
+zh_CN.GB18030... done
+zh_CN.GBK... done
+......
+II. 系统环境支持GB*内码了，但用vi, gedit等工具访问文件还会继续乱码，需要针对不同的工具分别配置，使之自己检测支持范围内的编码
+e.g. vi
+执行 sudo vi /etc/vim/vimrc
+加入以下配置参数
+let &termencoding=&encoding
+set fileencodings=utf-8,gb18030,gbk,gb2312,big5
+e.g. gedit
+执行 sudo gconf-editor
+选择 apps/gedit-2/preferences/encodings
+找到 auto_detected 编辑，在Values中分别加入 GB18030,GBK,GB2312,BIG5
+</pre> 
+** 设置ubuntu linux的系统字符集为GBK
+<pre>
+文件从window上传到u buntu后会显示乱码，原因时因为ubuntu环境设置默认是utf8，windows默认都是GBK，对拷的文件转化后就会乱码。只好手动将ubuntu环境设置为GBK
+1、首先设置sudo vi /var/lib/locales/supported.d/local
+添加一行 zh_CN.GBK GBK
+2、sudo locale-gen
+3、修改/etc/environment
+PATH=”/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11:/usr/games”
+LANGUAGE=”zh_CN:zh:en_US:en”
+GST_ID3_TAG_ENCODING=GBK
+LANG=zh_CN.GBK
+LC_CTYLE=zh_CN.GBK
+CLASSPATH=”/usr/lib/jvm/java-1.5.0-sun/lib”
+JAVA_HOME=”/usr/lib/jvm/java-1.5.0-sun”
+
+LC_ALL=”zh_CN.GBK”
+然后重启X即可
+</pre> 
+* geany linux下中文乱码的问题
+<pre>
+Geany是Ubuntu下一款很不错的文本编辑工具和开发工具，但美中不足的是使用Geany打开非UTF-8编码的简体中文文件时，一般显示乱码，查看看属性会发现Geany对于中文文件是按照ISO8859-1编码打开的。
+
+针对Ubuntu下Geany打开简体中文文件乱码的问题，有2个解决办法：
+
+1、菜单->编辑->首选项->文件，选中固定的编码打开文件，在后面的下拉框中选择 简体中文(GBK)
+
+2、创建第2套Geany配置，需要打开GBK文件时使用第2套配置打开，具体方法：
+
+I. 复制并修改 geany-gbk.desktop 文件
+
+sudo cp /usr/share/applications/geany.desktop /usr/share/applications/geany-gbk.desktop
+
+sudo geany /usr/share/applications/geany-gbk.desktop
+
+修改2处
+
+修改一：将其中的 Name 开头的所有行后面追加 -GBK (或者你喜欢的标识)，例如将原来的 Name=Geany 改成 Name=Geany-GBK ，这样的目的是使在 右键文件打开方式列表 中看到的项目会显示为 Geany-GBK
+
+修改二：将 Exec=geany %F 改为 Exec=geany -c /home/用户名/.geany %F
+
+这里是利用Geany的命令行参数 -c 去加载指定位置的配置文件，我是在~/.geany下创建的配置，如果你在其他目录创建配置，这个目录名改成你创建配置的目录即可。
+
+II. 在你的home目录下创建 .geany 目录或者你喜欢的目录名，注意前后一致即可:)
+
+III. 在终端命令行输入 geany -c ~/.geany 开启新配置的geany，然后到菜单->编辑->首选项->文件，选中固定的编码打开文件，在后面的下拉框中选择 简体中文(GBK)。（注：~代表用户的home目录，例如你的用户名是echo，那么你的home目录为 /home/echo，而一般不需直接输入/home/echo，直接使用 ~代替即可）
+
+这样子，在需要用GBK方式打开文件时，在右键文件打开方式列表中选择 Geany-GBK方式打开就不会再乱码了。
+</pre>
+* gedit自动识别GBK编码
+<pre>
+如果经常使用gbk的编码，那么就可以通过终端下面执行gconf-editor,然后选在apps下gedit-2下preferences下的encodings下的auto_detected,双击，添加gbk编码，同时gbk编码移动到utf-8的后面，这个细节也很重要。否则有时候还是会检测成其他编码。出现乱码。
+</pre>
+* kscope缺省编辑器kate字符编码
+<pre>
+Settings-->configure kscope-->open/save-->file encoding(gbk)
+</pre>
